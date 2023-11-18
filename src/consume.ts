@@ -15,6 +15,7 @@ const start = async () => {
     try {
       await consume();
     } catch (err) {
+      span.recordException(err);
       span.setStatus({
         code: SpanStatusCode.ERROR,
         message: JSON.stringify(err),

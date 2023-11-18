@@ -12,6 +12,7 @@ const start = async () => {
     try {
       await publish();
     } catch (err) {
+      span.recordException(err);
       span.setStatus({
         code: SpanStatusCode.ERROR,
         message: JSON.stringify(err),
