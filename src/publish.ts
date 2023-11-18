@@ -22,38 +22,36 @@ const start = async () => {
 };
 
 const publish = async () => {
-  return tracer.startActiveSpan("publish", async (span) => {
-    const sqs = new SQSClient({});
+  const sqs = new SQSClient({});
 
-    const getQueueUrlCommand = new GetQueueUrlCommand({
-      QueueName: process.env.QUEUE_NAME,
-    });
-
-    let queueUrl = "";
-
-    try {
-      const response = await sqs.send(getQueueUrlCommand);
-      if (!response.QueueUrl) {
-        throw new Error("no queue url");
-      }
-      queueUrl = response.QueueUrl;
-    } catch (err) {
-      console.log(err);
-      return;
-    }
-
-    const publishCommand = new SendMessageCommand({
-      QueueUrl: queueUrl,
-      MessageBody: "Hello World!",
-    });
-
-    try {
-      const response = await sqs.send(publishCommand);
-      console.log(JSON.stringify(response));
-    } catch (err) {
-      console.log(err);
-    }
+  const getQueueUrlCommand = new GetQueueUrlCommand({
+    QueueName: process.env.QUEUE_NAME,
   });
+
+  let queueUrl = "";
+
+  try {
+    const response = await sqs.send(getQueueUrlCommand);
+    if (!response.QueueUrl) {
+      throw new Error("no queue url");
+    }
+    queueUrl = response.QueueUrl;
+  } catch (err) {
+    console.log(err);
+    return;
+  }
+
+  const publishCommand = new SendMessageCommand({
+    QueueUrl: queueUrl,
+    MessageBody: "Hello World!",
+  });
+
+  try {
+    const response = await sqs.send(publishCommand);
+    console.log(JSON.stringify(response));
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 start().then(async () => {
