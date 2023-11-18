@@ -1,0 +1,23 @@
+{
+  "name": "test-apm",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "send": "NODE_OPTIONS='--require ./node_modules/@jupiterone/platform-sdk-observability/telemetry.js' QUEUE_URL='https://sqs.us-east-1.amazonaws.com/564077667165/S3BucketNotEncrypted-DLQ' AWS_PROFILE=jupiterone-dev ENVIRONMENT=test SERVICE_NAME=test-apm-publisher PLATFORM=test node ./dist/publish.js",
+    "consume": "BUCKET_NAME=jupiterone-dev-tagging-test NODE_OPTIONS='--require ./node_modules/@jupiterone/platform-sdk-observability/telemetry.js' QUEUE_URL='https://sqs.us-east-1.amazonaws.com/564077667165/S3BucketNotEncrypted-DLQ' AWS_PROFILE=jupiterone-dev ENVIRONMENT=test SERVICE_NAME=test-apm-consumer PLATFORM=test node ./dist/consume.js",
+    "ts-send": "NODE_OPTIONS='--require ./node_modules/@jupiterone/platform-sdk-observability/telemetry.js' QUEUE_URL='https://sqs.us-east-1.amazonaws.com/564077667165/S3BucketNotEncrypted-DLQ' AWS_PROFILE=jupiterone-dev ENVIRONMENT=test SERVICE_NAME=test-apm-publisher PLATFORM=test npx ts-node ./src/publish.ts",
+    "ts-consume": "BUCKET_NAME=jupiterone-dev-tagging-test NODE_OPTIONS='--require ./node_modules/@jupiterone/platform-sdk-observability/telemetry.js' QUEUE_URL='https://sqs.us-east-1.amazonaws.com/564077667165/S3BucketNotEncrypted-DLQ' AWS_PROFILE=jupiterone-dev ENVIRONMENT=test SERVICE_NAME=test-apm-consumer PLATFORM=test npx ts-node ./src/consume.ts",
+    "bundle": "node esbuild.config.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.454.0",
+    "@aws-sdk/client-sqs": "^3.454.0",
+    "@jupiterone/platform-sdk-observability": "file:.yalc/@jupiterone/platform-sdk-observability"
+  },
+  "devDependencies": {
+    "esbuild": "^0.19.5"
+  }
+}
