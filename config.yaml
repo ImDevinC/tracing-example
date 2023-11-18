@@ -6,6 +6,8 @@ receivers:
       http:
 
 exporters:
+  debug:
+    verbosity: detailed
   otlp:
     endpoint: jaeger:4317
     tls:
@@ -15,11 +17,18 @@ processors:
   batch:
 
 service:
+  extensions: [zpages]
   pipelines:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp]
+      exporters: [debug, otlp]
   telemetry:
     metrics:
       address: 0.0.0.0:8888
+    logs:
+      level: info
+
+extensions:
+  zpages:
+    endpoint: :55679

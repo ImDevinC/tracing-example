@@ -1,11 +1,49 @@
-import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
-import { withObservabilityTopLevelHandler } from "@jupiterone/platform-sdk-observability/api";
+import {
+  GetQueueUrlCommand,
+  SQSClient,
+  SendMessageCommand,
+} from "@aws-sdk/client-sqs";
+import { SpanStatusCode, trace } from "@opentelemetry/api";
 
-const publish = withObservabilityTopLevelHandler({
-  run: async () => {
+const tracer = trace.getTracer(process.env.SERVICE_NAME!);
+
+const start = async () => {
+  return tracer.startActiveSpan("publish", async (span) => {
+    try {
+      await publish();
+    } catch (err) {
+      span.setStatus({
+        code: SpanStatusCode.ERROR,
+        message: JSON.stringify(err),
+      });
+    }
+    span.end();
+  });
+};
+
+const publish = async () => {
+  return tracer.startActiveSpan("publish", async (span) => {
     const sqs = new SQSClient({});
+
+    const getQueueUrlCommand = new GetQueueUrlCommand({
+      QueueName: process.env.QUEUE_NAME,
+    });
+
+    let queueUrl = "";
+
+    try {
+      const response = await sqs.send(getQueueUrlCommand);
+      if (!response.QueueUrl) {
+        throw new Error("no queue url");
+      }
+      queueUrl = response.QueueUrl;
+    } catch (err) {
+      console.log(err);
+      return;
+    }
+
     const publishCommand = new SendMessageCommand({
-      QueueUrl: process.env.QUEUE_URL,
+      QueueUrl: queueUrl,
       MessageBody: "Hello World!",
     });
 
@@ -15,7 +53,13 @@ const publish = withObservabilityTopLevelHandler({
     } catch (err) {
       console.log(err);
     }
-  },
-});
+  });
+};
 
-publish();
+start().then(async () => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, 5000);
+  }).then(() => {
+    console.log("done");
+  });
+});

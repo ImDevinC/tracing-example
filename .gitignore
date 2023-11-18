@@ -2,3 +2,4 @@ yalc.lock
 node_modules/
 .yalc/
 dist/
+.env
