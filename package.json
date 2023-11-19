@@ -6,7 +6,6 @@
   "scripts": {
     "send": "export $(cat .env | xargs) && SERVICE_NAME=test-apm-publisher  NODE_OPTIONS='--require=./src/telemetry.js' ts-node ./src/publish.ts",
     "consume": "export $(cat .env | xargs) && SERVICE_NAME=test-apm-consumer NODE_OPTIONS='--require=./src/telemetry.js' ts-node ./src/consume.ts",
-    "serve": "export $(cat .env | xargs) && SERVICE_NAME=test-apm-server NODE_OPTIONS='--require=./src/telemetry.js' ts-node ./src/server.ts",
     "app-consume": "export $(cat .env | xargs) && SERVICE_NAME=test-apm-app-consume NODE_OPTIONS='--require=./src/telemetry.js' ts-node ./src/app-consume.ts"
   },
   "author": "",
