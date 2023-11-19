@@ -11,7 +11,7 @@ const start = async () => {
   return tracer.startActiveSpan("publish", async (span) => {
     try {
       await publish();
-    } catch (err) {
+    } catch (err: any) {
       span.recordException(err);
       span.setStatus({
         code: SpanStatusCode.ERROR,

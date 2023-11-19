@@ -14,7 +14,7 @@ const start = async () => {
   return tracer.startActiveSpan("consume", async (span) => {
     try {
       await consume();
-    } catch (err) {
+    } catch (err: any) {
       span.recordException(err);
       span.setStatus({
         code: SpanStatusCode.ERROR,

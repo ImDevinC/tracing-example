@@ -6,6 +6,9 @@ const {
 } = require("@opentelemetry/exporter-trace-otlp-proto");
 const { NodeSDK } = require("@opentelemetry/sdk-node");
 const { BatchSpanProcessor } = require("@opentelemetry/sdk-trace-base");
+const { ConsoleSpanExporter } = require("@opentelemetry/sdk-trace-node");
+
+// const consoleExporter = new ConsoleSpanExporter();
 
 const exporter = new OTLPTraceExporter({
   url:
@@ -25,7 +28,7 @@ const sdk = new NodeSDK({
       "@opentelemetry/instrumentation-aws-sdk": {
         sqsExtractContextPropagationFromPayload: true,
         suppressInternalInstrumentation: true,
-      },
+      }
     }),
   ],
 });
