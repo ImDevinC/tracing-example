@@ -15,6 +15,7 @@ const start = async () => {
     try {
       await consume();
     } catch (err: any) {
+      console.log(err);
       span.recordException(err);
       span.setStatus({
         code: SpanStatusCode.ERROR,
@@ -27,24 +28,8 @@ const start = async () => {
 
 const consume = async () => {
   const sqs = new SQSClient({});
-  const getQueueUrlCommand = new GetQueueUrlCommand({
-    QueueName: process.env.QUEUE_NAME,
-  });
-
-  let queueUrl = "";
-
-  try {
-    const response = await sqs.send(getQueueUrlCommand);
-    if (!response.QueueUrl) {
-      throw new Error("no queue url");
-    }
-    queueUrl = response.QueueUrl;
-  } catch (err) {
-    throw err;
-  }
-
   const publishCommand = new ReceiveMessageCommand({
-    QueueUrl: queueUrl,
+    QueueUrl: process.env.QUEUE_URL,
   });
 
   let messages: Message[] = [];
@@ -70,7 +55,7 @@ const consume = async () => {
       Body: message.Body,
     });
     const deleteMessageCommand = new DeleteMessageCommand({
-      QueueUrl: queueUrl,
+      QueueUrl: process.env.QUEUE_URL,
       ReceiptHandle: message.ReceiptHandle,
     });
     try {

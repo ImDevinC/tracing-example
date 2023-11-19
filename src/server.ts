@@ -8,28 +8,13 @@ import { parse } from "url";
 
 const sqs = new SQSClient({});
 
-const getQueueUrlCommand = new GetQueueUrlCommand({
-  QueueName: process.env.QUEUE_NAME!,
-});
-
-let queueUrl = "";
-
-try {
-  sqs.send(getQueueUrlCommand).then((resp) => {
-    queueUrl = resp.QueueUrl!;
-  });
-} catch (err) {
-  console.log(err);
-  process.exit(1);
-}
-
 createServer(async (req, res) => {
   const uri = parse(req.url!, true);
   const routeKey = `${req.method} ${uri.pathname}`;
   switch (routeKey) {
     case "POST /items":
       const sendCommand = new SendMessageCommand({
-        QueueUrl: queueUrl,
+        QueueUrl: process.env.QUEUE_URL,
         MessageBody: "Hello World!",
       });
       try {

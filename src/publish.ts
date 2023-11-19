@@ -12,6 +12,7 @@ const start = async () => {
     try {
       await publish();
     } catch (err: any) {
+      console.log(err);
       span.recordException(err);
       span.setStatus({
         code: SpanStatusCode.ERROR,
@@ -25,25 +26,8 @@ const start = async () => {
 const publish = async () => {
   const sqs = new SQSClient({});
 
-  const getQueueUrlCommand = new GetQueueUrlCommand({
-    QueueName: process.env.QUEUE_NAME,
-  });
-
-  let queueUrl = "";
-
-  try {
-    const response = await sqs.send(getQueueUrlCommand);
-    if (!response.QueueUrl) {
-      throw new Error("no queue url");
-    }
-    queueUrl = response.QueueUrl;
-  } catch (err) {
-    console.log(err);
-    return;
-  }
-
   const publishCommand = new SendMessageCommand({
-    QueueUrl: queueUrl,
+    QueueUrl: process.env.QUEUE_URL,
     MessageBody: "Hello World!",
   });
 
@@ -51,7 +35,7 @@ const publish = async () => {
     const response = await sqs.send(publishCommand);
     console.log(JSON.stringify(response));
   } catch (err) {
-    console.log(err);
+    throw err;
   }
 };
 
