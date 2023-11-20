@@ -25,22 +25,6 @@ When running `npm run send`, the process sends a message to the SQS queue with t
 
 When running `npm run consume`, the process reads a message from the SQS queue, uploads the contents of the message body to the S3 bucket, and then deletes the message from the queue.
 
-## Working example
-If you instead use `npm run app-consume` to read from SQS, then the proper trace link does show up.
-```json
-  links: [
-    {
-      context: {
-        traceId: "e5542e0485177fe00346b0c651df31af",
-        spanId: "27e72eea0cc7aef5",
-        traceFlags: 1,
-        isRemote: true
-      },
-      attributes: {}
-    }
-  ]
-```
-
 ### The solution
 Due to the way SQS instrumentation works, [documented here](https://github.com/open-telemetry/opentelemetry-js-contrib/blob/main/plugins/node/opentelemetry-instrumentation-aws-sdk/doc/sqs.md#processing-spans), looping over each message has to be done in a specific manner. Using the following will not work:
 ```typescript
