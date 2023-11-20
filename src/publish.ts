@@ -1,27 +1,4 @@
-import {
-  GetQueueUrlCommand,
-  SQSClient,
-  SendMessageCommand,
-} from "@aws-sdk/client-sqs";
-import { SpanStatusCode, trace } from "@opentelemetry/api";
-
-const tracer = trace.getTracer(process.env.SERVICE_NAME!);
-
-const start = async () => {
-  return tracer.startActiveSpan("publish", async (span) => {
-    try {
-      await publish();
-    } catch (err: any) {
-      console.log(err);
-      span.recordException(err);
-      span.setStatus({
-        code: SpanStatusCode.ERROR,
-        message: JSON.stringify(err),
-      });
-    }
-    span.end();
-  });
-};
+import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 
 const publish = async () => {
   const sqs = new SQSClient({});
@@ -39,7 +16,7 @@ const publish = async () => {
   }
 };
 
-start().then(async () => {
+publish().then(async () => {
   return new Promise((resolve) => {
     setTimeout(resolve, 5000);
   }).then(() => {
