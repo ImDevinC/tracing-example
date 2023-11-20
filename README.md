@@ -14,7 +14,6 @@ To run, perform the following:
 1. Use `npm run send` to publish a message to the SQS queue
 1. Use `npm run consume` to consume the message from the SQS queue
 1. Look in Jaeger at `localhost:16686` and you should see a linked trace between the two services
-   - **Currently, this does not work**
 
 ## How it works
 
@@ -40,4 +39,30 @@ If you instead use `npm run app-consume` to read from SQS, then the proper trace
       attributes: {}
     }
   ]
+```
+
+### The solution
+Due to the way SQS instrumentation works, [documented here](https://github.com/open-telemetry/opentelemetry-js-contrib/blob/main/plugins/node/opentelemetry-instrumentation-aws-sdk/doc/sqs.md#processing-spans), looping over each message has to be done in a specific manner. Using the following will not work:
+```typescript
+const receiveCommand = new ReceiveMessageCommand({
+  QueueUrl: process.env.QUEUE_URL,
+});
+const messages = await sqs.send(receiveCommand).Messages;
+for (const message of messages) {
+  // Do the stuff
+}
+```
+But the following will
+```typescript
+const processMessage = async(message: Message) => {
+	// Do the stuff
+}
+
+const receiveCommand = new ReceiveMessageCommand({
+  QueueUrl: process.env.QUEUE_URL,
+});
+const messages = await sqs.send(receiveCommand).Messages;
+const promises: Promise<void>[] = [];
+messages.forEach((message) => { promises.push(processMessage(message)) };
+await Promise.all(messages)
 ```

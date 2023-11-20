@@ -6,16 +6,13 @@ const {
 } = require("@opentelemetry/exporter-trace-otlp-proto");
 const { NodeSDK } = require("@opentelemetry/sdk-node");
 const { BatchSpanProcessor } = require("@opentelemetry/sdk-trace-base");
-const { ConsoleSpanExporter } = require("@opentelemetry/sdk-trace-node");
 
-const exporter = new ConsoleSpanExporter();
-
-// const exporter = new OTLPTraceExporter({
-//   url:
-//     "http://" +
-//     (process.env.OTEL_COLLECTOR_URL ?? "localhost:4318") +
-//     "/v1/traces",
-// });
+const exporter = new OTLPTraceExporter({
+  url:
+    "http://" +
+    (process.env.OTEL_COLLECTOR_URL ?? "localhost:4318") +
+    "/v1/traces",
+});
 
 const sdk = new NodeSDK({
   spanProcessor: new BatchSpanProcessor(exporter),
